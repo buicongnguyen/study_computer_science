@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CS Study Sprint</title>
+    <meta
+      name="description"
+      content="A lightweight computer science study app with flashcards, quiz mode, and progress tracking."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Computer Science Study App</p>
+          <h1>CS Study Sprint</h1>
+          <p class="hero-text">
+            Train core computer science concepts with topic filters, quick-answer flashcards,
+            and a quiz mode that remembers what still needs review.
+          </p>
+        </div>
+        <div class="hero-panel">
+          <div class="hero-panel__label">Today’s focus</div>
+          <p id="focus-summary" class="hero-panel__summary"></p>
+          <div class="hero-panel__meta">
+            <span id="focus-topic"></span>
+            <span id="focus-difficulty"></span>
+          </div>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="primary-column">
+          <div class="stats-grid" id="stats-grid"></div>
+
+          <section class="toolbar card-surface">
+            <div class="toolbar__row">
+              <div class="mode-switch" role="tablist" aria-label="Study mode">
+                <button class="mode-switch__button is-active" data-mode="flashcards">Flashcards</button>
+                <button class="mode-switch__button" data-mode="quiz">Quiz mode</button>
+              </div>
+
+              <label class="search">
+                <span class="search__label">Search questions</span>
+                <input
+                  id="search-input"
+                  type="search"
+                  placeholder="Try binary search, ACID, TCP..."
+                  autocomplete="off"
+                />
+              </label>
+            </div>
+
+            <div class="topics" id="topic-filters"></div>
+          </section>
+
+          <section class="study-stage card-surface" id="study-stage"></section>
+        </section>
+
+        <aside class="secondary-column">
+          <section class="card-surface side-panel">
+            <div class="side-panel__header">
+              <h2>Recommended next steps</h2>
+              <p>Use your recent quiz activity to decide what to revisit.</p>
+            </div>
+            <div id="recommendations" class="recommendations"></div>
+          </section>
+
+          <section class="card-surface side-panel">
+            <div class="side-panel__header">
+              <h2>Question browser</h2>
+              <p>Jump straight into any topic or concept.</p>
+            </div>
+            <div id="question-list" class="question-list"></div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>
