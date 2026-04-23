@@ -32,6 +32,7 @@
           <p id="focus-summary" class="hero-panel__summary"></p>
           <div class="hero-panel__meta">
             <span id="focus-topic"></span>
+            <span id="focus-module"></span>
             <span id="focus-difficulty"></span>
           </div>
         </div>
@@ -60,12 +61,23 @@
             </div>
 
             <div class="topics" id="topic-filters"></div>
+            <div class="modules" id="module-filters"></div>
           </section>
+
+          <section class="course-brief card-surface" id="course-brief"></section>
 
           <section class="study-stage card-surface" id="study-stage"></section>
         </section>
 
         <aside class="secondary-column">
+          <section class="card-surface side-panel">
+            <div class="side-panel__header">
+              <h2>Course tree</h2>
+              <p>Browse the source-backed structure of the active course.</p>
+            </div>
+            <div id="course-outline" class="course-outline"></div>
+          </section>
+
           <section class="card-surface side-panel">
             <div class="side-panel__header">
               <h2>Recommended next steps</h2>
@@ -76,8 +88,8 @@
 
           <section class="card-surface side-panel">
             <div class="side-panel__header">
-              <h2>Question browser</h2>
-              <p>Jump straight into any topic or concept.</p>
+              <h2>Q&amp;A browser</h2>
+              <p>Jump into a researched course, module, or exact study card.</p>
             </div>
             <div id="question-list" class="question-list"></div>
           </section>

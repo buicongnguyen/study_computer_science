@@ -1,10 +1,19 @@
-import { questionBank, topics } from "./questions.js";
+import {
+  courseByTopic,
+  courseCatalog,
+  moduleIndex,
+  questionBank,
+  topics,
+  totalModules,
+} from "./questions.js";
 
-const STORAGE_KEY = "cs-study-sprint-progress-v1";
+const STORAGE_KEY = "cs-study-sprint-progress-v2";
+const validQuestionIds = new Set(questionBank.map((card) => card.id));
 
 const state = {
   mode: "flashcards",
   topic: "All",
+  moduleId: "All",
   query: "",
   currentCardId: questionBank[0]?.id ?? null,
   answerVisible: false,
@@ -16,12 +25,16 @@ const state = {
 
 const statsGrid = document.querySelector("#stats-grid");
 const topicFilters = document.querySelector("#topic-filters");
+const moduleFilters = document.querySelector("#module-filters");
 const searchInput = document.querySelector("#search-input");
+const courseBrief = document.querySelector("#course-brief");
 const studyStage = document.querySelector("#study-stage");
+const courseOutline = document.querySelector("#course-outline");
 const questionList = document.querySelector("#question-list");
 const recommendations = document.querySelector("#recommendations");
 const focusSummary = document.querySelector("#focus-summary");
 const focusTopic = document.querySelector("#focus-topic");
+const focusModule = document.querySelector("#focus-module");
 const focusDifficulty = document.querySelector("#focus-difficulty");
 
 function escapeHtml(value) {
@@ -38,32 +51,12 @@ function escapeHtml(value) {
   );
 }
 
-document.querySelectorAll("[data-mode]").forEach((button) => {
-  button.addEventListener("click", () => {
-    state.mode = button.dataset.mode;
-    document.querySelectorAll("[data-mode]").forEach((candidate) => {
-      candidate.classList.toggle("is-active", candidate === button);
-    });
-    if (state.mode === "quiz") {
-      ensureQuizCard();
-    }
-    render();
-  });
-});
-
-searchInput.addEventListener("input", (event) => {
-  state.query = event.target.value.trim();
-  ensureCurrentCardIsVisible();
-  ensureQuizCard();
-  render();
-});
-
 function loadProgress() {
   try {
     const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
     return {
-      mastered: parsed?.mastered ?? [],
-      review: parsed?.review ?? [],
+      mastered: (parsed?.mastered ?? []).filter((id) => validQuestionIds.has(id)),
+      review: (parsed?.review ?? []).filter((id) => validQuestionIds.has(id)),
       quizAsked: parsed?.quizAsked ?? 0,
       quizCorrect: parsed?.quizCorrect ?? 0,
       streak: parsed?.streak ?? 0,
@@ -83,17 +76,74 @@ function saveProgress() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.progress));
 }
 
+function updateModeButtons() {
+  document.querySelectorAll("[data-mode]").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.mode === state.mode);
+  });
+}
+
+function setMode(mode) {
+  state.mode = mode;
+  updateModeButtons();
+  if (state.mode === "quiz") {
+    ensureQuizCard();
+  }
+}
+
+function getActiveCourse() {
+  return courseByTopic[state.topic] ?? null;
+}
+
+function getActiveModule() {
+  const course = getActiveCourse();
+  if (!course || state.moduleId === "All") {
+    return null;
+  }
+  return course.modules.find((module) => module.id === state.moduleId) ?? null;
+}
+
+function getQuestionCountForTopic(topic) {
+  return questionBank.filter((card) => card.topic === topic).length;
+}
+
+function getQuestionCountForModule(moduleId) {
+  return questionBank.filter((card) => card.moduleId === moduleId).length;
+}
+
+function getModuleTitle(moduleId) {
+  return moduleIndex[moduleId]?.title ?? "General";
+}
+
+function ensureModuleIsVisible() {
+  const course = getActiveCourse();
+  if (!course) {
+    state.moduleId = "All";
+    return;
+  }
+
+  if (state.moduleId !== "All" && !course.modules.some((module) => module.id === state.moduleId)) {
+    state.moduleId = "All";
+  }
+}
+
 function getFilteredQuestions() {
+  ensureModuleIsVisible();
   const query = state.query.toLowerCase();
+
   return questionBank.filter((card) => {
     const topicMatches = state.topic === "All" || card.topic === state.topic;
-    const queryMatches =
-      !query ||
-      [card.topic, card.question, card.answer, card.explanation]
-        .join(" ")
-        .toLowerCase()
-        .includes(query);
-    return topicMatches && queryMatches;
+    const moduleMatches = state.moduleId === "All" || card.moduleId === state.moduleId;
+    const haystack = [
+      card.topic,
+      getModuleTitle(card.moduleId),
+      card.question,
+      card.answer,
+      card.explanation,
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return topicMatches && moduleMatches && (!query || haystack.includes(query));
   });
 }
 
@@ -115,10 +165,55 @@ function pickNextCard(filtered, currentId = null) {
 
 function ensureCurrentCardIsVisible() {
   const filtered = getFilteredQuestions();
-  if (!filtered.find((card) => card.id === state.currentCardId)) {
+  if (!filtered.some((card) => card.id === state.currentCardId)) {
     state.currentCardId = filtered[0]?.id ?? null;
     state.answerVisible = false;
   }
+}
+
+function pickDistractorAnswers(card) {
+  const candidates = questionBank.filter(
+    (candidate) => candidate.id !== card.id && candidate.answer !== card.answer
+  );
+
+  const prioritized = [
+    ...candidates.filter(
+      (candidate) => candidate.topic === card.topic && candidate.moduleId === card.moduleId
+    ),
+    ...candidates.filter(
+      (candidate) => candidate.topic === card.topic && candidate.moduleId !== card.moduleId
+    ),
+    ...candidates.filter((candidate) => candidate.topic !== card.topic),
+  ];
+
+  const answers = [];
+  for (const candidate of prioritized) {
+    if (!answers.includes(candidate.answer)) {
+      answers.push(candidate.answer);
+    }
+    if (answers.length === 3) {
+      break;
+    }
+  }
+
+  return answers;
+}
+
+function shuffle(items) {
+  const clone = [...items];
+  for (let index = clone.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [clone[index], clone[randomIndex]] = [clone[randomIndex], clone[index]];
+  }
+  return clone;
+}
+
+function buildQuizCard(filtered) {
+  const focusPool = filtered.filter((card) => state.progress.review.includes(card.id));
+  const basePool = focusPool.length ? focusPool : filtered;
+  const card = basePool[Math.floor(Math.random() * basePool.length)];
+  const options = shuffle([card.answer, ...pickDistractorAnswers(card)]).slice(0, 4);
+  return { card, options };
 }
 
 function ensureQuizCard() {
@@ -135,37 +230,6 @@ function ensureQuizCard() {
     state.quizLocked = false;
     state.selectedAnswer = null;
   }
-}
-
-function buildQuizCard(filtered) {
-  const focusPool = filtered.filter((card) => state.progress.review.includes(card.id));
-  const basePool = focusPool.length ? focusPool : filtered;
-  const card = basePool[Math.floor(Math.random() * basePool.length)];
-
-  const distractors = [];
-  for (const candidate of questionBank) {
-    if (candidate.id === card.id || candidate.answer === card.answer) {
-      continue;
-    }
-    if (!distractors.find((option) => option.answer === candidate.answer)) {
-      distractors.push(candidate);
-    }
-    if (distractors.length === 3) {
-      break;
-    }
-  }
-
-  const options = shuffle([card, ...distractors]).map((option) => option.answer);
-  return { card, options };
-}
-
-function shuffle(items) {
-  const clone = [...items];
-  for (let index = clone.length - 1; index > 0; index -= 1) {
-    const randomIndex = Math.floor(Math.random() * (index + 1));
-    [clone[index], clone[randomIndex]] = [clone[randomIndex], clone[index]];
-  }
-  return clone;
 }
 
 function updateProgress(id, target) {
@@ -219,45 +283,89 @@ function nextFlashcard() {
 }
 
 function nextQuizCard() {
-  ensureQuizCard();
   const filtered = getFilteredQuestions();
   if (!filtered.length) {
     return;
   }
+
   state.currentQuiz = buildQuizCard(filtered);
   state.quizLocked = false;
   state.selectedAnswer = null;
   render();
 }
 
+function openCourse(topic) {
+  state.topic = topic;
+  state.moduleId = "All";
+  state.answerVisible = false;
+  ensureCurrentCardIsVisible();
+  ensureQuizCard();
+  render();
+}
+
+function openModule(moduleId) {
+  state.moduleId = moduleId;
+  state.answerVisible = false;
+  ensureCurrentCardIsVisible();
+  ensureQuizCard();
+  render();
+}
+
+function openCard(cardId) {
+  const card = questionBank.find((candidate) => candidate.id === cardId);
+  if (!card) {
+    return;
+  }
+
+  state.topic = card.topic;
+  state.moduleId = card.moduleId;
+  state.currentCardId = card.id;
+  state.answerVisible = false;
+  setMode("flashcards");
+  ensureQuizCard();
+  render();
+}
+
+document.querySelectorAll("[data-mode]").forEach((button) => {
+  button.addEventListener("click", () => {
+    setMode(button.dataset.mode);
+    render();
+  });
+});
+
+searchInput.addEventListener("input", (event) => {
+  state.query = event.target.value.trim();
+  ensureCurrentCardIsVisible();
+  ensureQuizCard();
+  render();
+});
+
 function renderStats(filtered) {
-  const total = questionBank.length;
-  const masteredCount = state.progress.mastered.length;
-  const reviewCount = state.progress.review.length;
+  const activeCourse = getActiveCourse();
   const accuracy = state.progress.quizAsked
     ? Math.round((state.progress.quizCorrect / state.progress.quizAsked) * 100)
     : 0;
 
   const cards = [
     {
-      label: "Question bank",
-      value: total,
-      detail: `${filtered.length} visible with current filters`,
+      label: "Courses researched",
+      value: courseCatalog.length,
+      detail: activeCourse ? `${activeCourse.topic} selected` : "All course maps visible",
     },
     {
-      label: "Mastered",
-      value: masteredCount,
-      detail: `${Math.round((masteredCount / total) * 100)}% of all cards`,
+      label: "Modules mapped",
+      value: totalModules,
+      detail: activeCourse ? `${activeCourse.modules.length} in this course` : "Structured into study trees",
     },
     {
-      label: "Needs review",
-      value: reviewCount,
-      detail: reviewCount ? "Focused practice is ready" : "Nothing flagged right now",
+      label: "Q&A cards",
+      value: questionBank.length,
+      detail: `${filtered.length} match current filters`,
     },
     {
-      label: "Quiz accuracy",
-      value: `${accuracy}%`,
-      detail: `${state.progress.streak} correct in current streak`,
+      label: "Progress",
+      value: state.progress.mastered.length,
+      detail: `${state.progress.review.length} in review · ${accuracy}% quiz accuracy`,
     },
   ];
 
@@ -274,12 +382,11 @@ function renderStats(filtered) {
     .join("");
 }
 
-function renderTopicFilters(filtered) {
+function renderTopicFilters() {
   topicFilters.innerHTML = topics
     .map((topic) => {
       const isActive = topic === state.topic;
-      const count =
-        topic === "All" ? questionBank.length : questionBank.filter((card) => card.topic === topic).length;
+      const count = topic === "All" ? questionBank.length : getQuestionCountForTopic(topic);
 
       return `
         <button class="topic-pill ${isActive ? "is-active" : ""}" data-topic="${escapeHtml(topic)}">
@@ -292,6 +399,8 @@ function renderTopicFilters(filtered) {
   topicFilters.querySelectorAll("[data-topic]").forEach((button) => {
     button.addEventListener("click", () => {
       state.topic = button.dataset.topic;
+      state.moduleId = "All";
+      state.answerVisible = false;
       ensureCurrentCardIsVisible();
       ensureQuizCard();
       render();
@@ -299,16 +408,274 @@ function renderTopicFilters(filtered) {
   });
 }
 
+function renderModuleFilters() {
+  const activeCourse = getActiveCourse();
+  if (!activeCourse) {
+    moduleFilters.innerHTML = `
+      <p class="module-filter-note">Open a course to unlock module filtering and a detailed tree.</p>
+    `;
+    return;
+  }
+
+  moduleFilters.innerHTML = [
+    `
+      <button class="topic-pill ${state.moduleId === "All" ? "is-active" : ""}" data-module-id="All">
+        All modules · ${getQuestionCountForTopic(activeCourse.topic)}
+      </button>
+    `,
+    ...activeCourse.modules.map((module) => {
+      const isActive = module.id === state.moduleId;
+      return `
+        <button class="topic-pill ${isActive ? "is-active" : ""}" data-module-id="${module.id}">
+          ${escapeHtml(module.title)} · ${getQuestionCountForModule(module.id)}
+        </button>
+      `;
+    }),
+  ].join("");
+
+  moduleFilters.querySelectorAll("[data-module-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      openModule(button.dataset.moduleId);
+    });
+  });
+}
+
+function renderCourseBrief() {
+  const activeCourse = getActiveCourse();
+  const activeModule = getActiveModule();
+
+  if (!activeCourse) {
+    courseBrief.innerHTML = `
+      <div class="course-brief__header">
+        <div>
+          <p class="eyebrow">Curriculum Plan</p>
+          <h2>Source-backed course trees</h2>
+          <p class="course-brief__lead">
+            Each course below is adapted from official university course pages and reorganized into
+            app-friendly modules with matching study cards.
+          </p>
+        </div>
+        <div class="course-brief__summary-card">
+          <strong>${courseCatalog.length} courses</strong>
+          <span>${totalModules} modules · ${questionBank.length} Q&amp;A cards</span>
+        </div>
+      </div>
+      <div class="course-selector-grid">
+        ${courseCatalog
+          .map(
+            (course) => `
+              <article class="course-selector-card">
+                <div>
+                  <p class="course-selector-card__eyebrow">${escapeHtml(course.topic)}</p>
+                  <strong>${escapeHtml(course.tagline)}</strong>
+                  <p>${escapeHtml(course.overview)}</p>
+                </div>
+                <div class="course-selector-card__meta">
+                  <span class="chip">${course.modules.length} modules</span>
+                  <span class="chip">${getQuestionCountForTopic(course.topic)} cards</span>
+                </div>
+                <div class="course-selector-card__actions">
+                  <button class="ghost-button" data-open-topic="${escapeHtml(course.topic)}">Open course</button>
+                  <a class="source-link" href="${course.sources[0].url}" target="_blank" rel="noreferrer">
+                    ${escapeHtml(course.sources[0].label)}
+                  </a>
+                </div>
+              </article>
+            `
+          )
+          .join("")}
+      </div>
+    `;
+
+    courseBrief.querySelectorAll("[data-open-topic]").forEach((button) => {
+      button.addEventListener("click", () => openCourse(button.dataset.openTopic));
+    });
+    return;
+  }
+
+  courseBrief.innerHTML = `
+    <div class="course-brief__header">
+      <div>
+        <p class="eyebrow">Curriculum Plan</p>
+        <h2>${escapeHtml(activeCourse.topic)}</h2>
+        <p class="course-brief__lead">${escapeHtml(activeCourse.overview)}</p>
+      </div>
+      <div class="course-brief__summary-card">
+        <strong>${getQuestionCountForTopic(activeCourse.topic)} Q&amp;A cards</strong>
+        <span>${activeCourse.modules.length} modules grounded in official course material</span>
+      </div>
+    </div>
+
+    <div class="course-brief__grid">
+      <article class="info-block">
+        <h3>Study goals</h3>
+        <ul class="info-list">
+          ${activeCourse.studyGoals
+            .map((goal) => `<li>${escapeHtml(goal)}</li>`)
+            .join("")}
+        </ul>
+      </article>
+      <article class="info-block">
+        <h3>Source references</h3>
+        <div class="source-list">
+          ${activeCourse.sources
+            .map(
+              (source) => `
+                <a class="source-link" href="${source.url}" target="_blank" rel="noreferrer">
+                  ${escapeHtml(source.label)}
+                </a>
+              `
+            )
+            .join("")}
+        </div>
+      </article>
+    </div>
+
+    ${
+      activeModule
+        ? `
+          <article class="module-focus">
+            <div class="module-focus__header">
+              <div>
+                <h3>${escapeHtml(activeModule.title)}</h3>
+                <p>${escapeHtml(activeModule.summary)}</p>
+              </div>
+              <button class="ghost-button" id="clear-module-focus">Show all modules</button>
+            </div>
+            <ul class="info-list">
+              ${activeModule.lessons
+                .map(
+                  (lesson) => `
+                    <li>
+                      <strong>${escapeHtml(lesson.title)}.</strong>
+                      ${escapeHtml(lesson.note)}
+                    </li>
+                  `
+                )
+                .join("")}
+            </ul>
+          </article>
+        `
+        : `
+          <article class="module-focus">
+            <div class="module-focus__header">
+              <div>
+                <h3>Suggested path</h3>
+                <p>Move left to right through the module tree, then use flashcards or quiz mode for each segment.</p>
+              </div>
+            </div>
+            <div class="path-grid">
+              ${activeCourse.modules
+                .map(
+                  (module, index) => `
+                    <button class="path-step" data-jump-module="${module.id}">
+                      <span class="path-step__index">Module ${index + 1}</span>
+                      <strong>${escapeHtml(module.title)}</strong>
+                      <span>${getQuestionCountForModule(module.id)} cards</span>
+                    </button>
+                  `
+                )
+                .join("")}
+            </div>
+          </article>
+        `
+    }
+  `;
+
+  courseBrief.querySelectorAll("[data-jump-module]").forEach((button) => {
+    button.addEventListener("click", () => openModule(button.dataset.jumpModule));
+  });
+
+  const clearButton = courseBrief.querySelector("#clear-module-focus");
+  if (clearButton) {
+    clearButton.addEventListener("click", () => openModule("All"));
+  }
+}
+
+function renderCourseOutline() {
+  const activeCourse = getActiveCourse();
+
+  if (!activeCourse) {
+    courseOutline.innerHTML = courseCatalog
+      .map(
+        (course) => `
+          <article class="outline-course-card">
+            <strong>${escapeHtml(course.topic)}</strong>
+            <p>${escapeHtml(course.tagline)}</p>
+            <div class="question-list__meta">
+              <span class="chip">${course.modules.length} modules</span>
+              <span class="chip">${getQuestionCountForTopic(course.topic)} cards</span>
+            </div>
+            <button class="ghost-button outline-course-card__button" data-open-topic="${escapeHtml(course.topic)}">
+              Open course tree
+            </button>
+          </article>
+        `
+      )
+      .join("");
+
+    courseOutline.querySelectorAll("[data-open-topic]").forEach((button) => {
+      button.addEventListener("click", () => openCourse(button.dataset.openTopic));
+    });
+    return;
+  }
+
+  courseOutline.innerHTML = `
+    <button class="ghost-button course-outline__clear ${state.moduleId === "All" ? "is-highlighted" : ""}" data-module-id="All">
+      All modules
+    </button>
+    ${activeCourse.modules
+      .map((module) => {
+        const isActive = module.id === state.moduleId;
+        const reviewCount = questionBank.filter(
+          (card) => card.moduleId === module.id && state.progress.review.includes(card.id)
+        ).length;
+
+        return `
+          <article class="module-card ${isActive ? "is-active" : ""}" data-module-id="${module.id}">
+            <div class="module-card__header">
+              <strong>${escapeHtml(module.title)}</strong>
+              <span class="module-card__count">${getQuestionCountForModule(module.id)} cards</span>
+            </div>
+            <p>${escapeHtml(module.summary)}</p>
+            <div class="question-list__meta">
+              ${reviewCount ? `<span class="chip">${reviewCount} review</span>` : `<span class="chip">No review flags</span>`}
+            </div>
+            <ul class="module-lessons">
+              ${module.lessons
+                .map(
+                  (lesson) => `
+                    <li>
+                      <strong>${escapeHtml(lesson.title)}:</strong>
+                      ${escapeHtml(lesson.note)}
+                    </li>
+                  `
+                )
+                .join("")}
+            </ul>
+          </article>
+        `;
+      })
+      .join("")}
+  `;
+
+  courseOutline.querySelectorAll("[data-module-id]").forEach((item) => {
+    item.addEventListener("click", () => openModule(item.dataset.moduleId));
+  });
+}
+
 function renderFocus(card) {
   if (!card) {
     focusSummary.textContent = "No cards match the current filter yet.";
-    focusTopic.textContent = "Adjust the topic or search";
+    focusTopic.textContent = "Adjust the course filter";
+    focusModule.textContent = "Module view paused";
     focusDifficulty.textContent = "Study queue paused";
     return;
   }
 
   focusSummary.textContent = card.question;
   focusTopic.textContent = card.topic;
+  focusModule.textContent = getModuleTitle(card.moduleId);
   focusDifficulty.textContent = `${card.difficulty} difficulty`;
 }
 
@@ -321,7 +688,7 @@ function renderFlashcards(filtered) {
       <div class="empty-state">
         <div>
           <h2>No matching questions</h2>
-          <p>Try clearing the search or switching back to the full question bank.</p>
+          <p>Try clearing the search, opening a different course, or resetting the module filter.</p>
         </div>
       </div>
     `;
@@ -335,10 +702,11 @@ function renderFlashcards(filtered) {
     <div class="stage-header">
       <div>
         <h2>Flashcard practice</h2>
-        <p>Reveal the answer, then mark how confident you feel before moving on.</p>
+        <p>Reveal the answer, compare it with your recall, and tag what still needs review.</p>
       </div>
       <div class="stage-badges">
         <span class="stage-badge">${escapeHtml(card.topic)}</span>
+        <span class="stage-badge">${escapeHtml(getModuleTitle(card.moduleId))}</span>
         <span class="stage-badge">${escapeHtml(card.difficulty)}</span>
       </div>
     </div>
@@ -361,7 +729,7 @@ function renderFlashcards(filtered) {
           ${isMastered ? "Mastered" : "Mark mastered"}
         </button>
         <button class="ghost-button ${isReview ? "is-warning" : ""}" id="mark-review">
-          ${isReview ? "Needs review" : "Needs review"}
+          Needs review
         </button>
         <button class="ghost-button" id="clear-status">Clear tag</button>
         <button class="ghost-button" id="next-card">Next card</button>
@@ -375,12 +743,12 @@ function renderFlashcards(filtered) {
   });
 
   studyStage.querySelector("#mark-mastered").addEventListener("click", () => {
-    updateProgress(card.id, state.progress.mastered.includes(card.id) ? "clear" : "mastered");
+    updateProgress(card.id, isMastered ? "clear" : "mastered");
     render();
   });
 
   studyStage.querySelector("#mark-review").addEventListener("click", () => {
-    updateProgress(card.id, state.progress.review.includes(card.id) ? "clear" : "review");
+    updateProgress(card.id, isReview ? "clear" : "review");
     render();
   });
 
@@ -415,10 +783,11 @@ function renderQuiz(filtered) {
     <div class="stage-header">
       <div>
         <h2>Quiz mode</h2>
-        <p>Answer from memory first, then use the explanation to tighten the concept.</p>
+        <p>Use the course tree to narrow the scope, then answer from memory before checking the explanation.</p>
       </div>
       <div class="stage-badges">
         <span class="stage-badge">${escapeHtml(quiz.card.topic)}</span>
+        <span class="stage-badge">${escapeHtml(getModuleTitle(quiz.card.moduleId))}</span>
         <span class="stage-badge">${escapeHtml(quiz.card.difficulty)}</span>
       </div>
     </div>
@@ -429,7 +798,7 @@ function renderQuiz(filtered) {
 
       <div class="quiz-options">
         ${quiz.options
-          .map((option) => {
+          .map((option, index) => {
             const classNames = [
               "quiz-option",
               state.quizLocked && option === quiz.card.answer ? "is-correct" : "",
@@ -441,7 +810,7 @@ function renderQuiz(filtered) {
               .join(" ");
 
             return `
-              <button class="${classNames}" data-answer="${escapeHtml(option)}" ${state.quizLocked ? "disabled" : ""}>
+              <button class="${classNames}" data-option-index="${index}" ${state.quizLocked ? "disabled" : ""}>
                 ${escapeHtml(option)}
               </button>
             `;
@@ -468,8 +837,11 @@ function renderQuiz(filtered) {
     </article>
   `;
 
-  studyStage.querySelectorAll("[data-answer]").forEach((button) => {
-    button.addEventListener("click", () => handleQuizAnswer(button.dataset.answer));
+  studyStage.querySelectorAll("[data-option-index]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const option = quiz.options[Number(button.dataset.optionIndex)];
+      handleQuizAnswer(option);
+    });
   });
 
   if (state.quizLocked) {
@@ -477,57 +849,77 @@ function renderQuiz(filtered) {
   }
 
   studyStage.querySelector("#switch-to-cards").addEventListener("click", () => {
-    state.mode = "flashcards";
     state.currentCardId = quiz.card.id;
     state.answerVisible = false;
-    document.querySelectorAll("[data-mode]").forEach((button) => {
-      button.classList.toggle("is-active", button.dataset.mode === "flashcards");
-    });
+    setMode("flashcards");
     render();
   });
 }
 
 function renderRecommendations(filtered) {
-  const countsByTopic = questionBank.reduce((accumulator, card) => {
-    accumulator[card.topic] ??= { review: 0, mastered: 0 };
-    if (state.progress.review.includes(card.id)) {
-      accumulator[card.topic].review += 1;
-    }
-    if (state.progress.mastered.includes(card.id)) {
-      accumulator[card.topic].mastered += 1;
-    }
-    return accumulator;
-  }, {});
-
-  const topReviewTopics = Object.entries(countsByTopic)
-    .sort((left, right) => right[1].review - left[1].review || left[1].mastered - right[1].mastered)
-    .slice(0, 3);
-
   const cards = [];
+  const activeCourse = getActiveCourse();
 
-  if (state.progress.review.length) {
-    const [topic, values] = topReviewTopics[0];
-    cards.push({
-      title: `Review ${topic} next`,
-      description: `${values.review} question${values.review === 1 ? "" : "s"} still flagged for review.`,
-    });
+  if (activeCourse) {
+    const rankedModules = activeCourse.modules
+      .map((module) => ({
+        module,
+        reviewCount: questionBank.filter(
+          (card) => card.moduleId === module.id && state.progress.review.includes(card.id)
+        ).length,
+      }))
+      .sort((left, right) => right.reviewCount - left.reviewCount);
+
+    if (rankedModules[0]?.reviewCount > 0) {
+      cards.push({
+        title: `Review ${rankedModules[0].module.title} next`,
+        description: `${rankedModules[0].reviewCount} card${
+          rankedModules[0].reviewCount === 1 ? "" : "s"
+        } in this module are still flagged for review.`,
+      });
+    } else {
+      cards.push({
+        title: `Work through ${activeCourse.modules[0].title}`,
+        description: "The course tree is ordered from foundations toward more advanced system ideas.",
+      });
+    }
   } else {
-    cards.push({
-      title: "You’re in a clean state",
-      description: "No cards are flagged for review, so quiz mode is a great next step.",
-    });
+    const topReviewTopic = courseCatalog
+      .map((course) => ({
+        topic: course.topic,
+        reviewCount: questionBank.filter(
+          (card) => card.topic === course.topic && state.progress.review.includes(card.id)
+        ).length,
+      }))
+      .sort((left, right) => right.reviewCount - left.reviewCount)[0];
+
+    if (topReviewTopic?.reviewCount > 0) {
+      cards.push({
+        title: `Return to ${topReviewTopic.topic}`,
+        description: `${topReviewTopic.reviewCount} review card${
+          topReviewTopic.reviewCount === 1 ? "" : "s"
+        } are waiting there.`,
+      });
+    } else {
+      cards.push({
+        title: "Open one course at a time",
+        description: "Choosing a course narrows the tree, module filters, and quiz distractors in a useful way.",
+      });
+    }
   }
 
   cards.push({
-    title: state.query ? "Search is active" : "Use filters for focused practice",
+    title: state.query ? "Search is active" : "Use the course tree to focus",
     description: state.query
       ? `${filtered.length} card${filtered.length === 1 ? "" : "s"} match "${state.query}".`
-      : "Pick one topic when you want a shorter, high-signal study session.",
+      : activeCourse
+        ? "Select a module when you want a tighter study session inside the current course."
+        : "Pick a course card to see its module breakdown and source links.",
   });
 
   cards.push({
     title: "Keep the streak moving",
-    description: `Current quiz streak: ${state.progress.streak}. Consecutive correct answers build retention fast.`,
+    description: `Current quiz streak: ${state.progress.streak}. Mastered: ${state.progress.mastered.length}/${questionBank.length}.`,
   });
 
   recommendations.innerHTML = cards
@@ -547,19 +939,22 @@ function renderQuestionList(filtered) {
     questionList.innerHTML = `
       <div class="recommendation-card">
         <strong>No questions found</strong>
-        <p>Clear the search to bring the full bank back.</p>
+        <p>Clear the search or expand the course filters to bring the bank back.</p>
       </div>
     `;
     return;
   }
 
-  const items = filtered.slice(0, 10);
+  const items = filtered.slice(0, 12);
   questionList.innerHTML = items
     .map((card) => {
       const activeCardId = state.mode === "quiz" ? state.currentQuiz?.card.id : state.currentCardId;
       const isActive = activeCardId === card.id;
-      const mastered = state.progress.mastered.includes(card.id) ? "Mastered" : null;
-      const review = state.progress.review.includes(card.id) ? "Review" : null;
+      const status = state.progress.mastered.includes(card.id)
+        ? "Mastered"
+        : state.progress.review.includes(card.id)
+          ? "Review"
+          : null;
 
       return `
         <article class="question-list__item ${isActive ? "is-active" : ""}" data-card-id="${card.id}">
@@ -567,9 +962,9 @@ function renderQuestionList(filtered) {
           <p>${escapeHtml(card.answer)}</p>
           <div class="question-list__meta">
             <span class="chip">${escapeHtml(card.topic)}</span>
+            <span class="chip">${escapeHtml(getModuleTitle(card.moduleId))}</span>
             <span class="chip">${escapeHtml(card.difficulty)}</span>
-            ${mastered ? `<span class="chip">${escapeHtml(mastered)}</span>` : ""}
-            ${review ? `<span class="chip">${escapeHtml(review)}</span>` : ""}
+            ${status ? `<span class="chip">${escapeHtml(status)}</span>` : ""}
           </div>
         </article>
       `;
@@ -577,24 +972,19 @@ function renderQuestionList(filtered) {
     .join("");
 
   questionList.querySelectorAll("[data-card-id]").forEach((item) => {
-    item.addEventListener("click", () => {
-      const cardId = item.dataset.cardId;
-      state.currentCardId = cardId;
-      state.mode = "flashcards";
-      state.answerVisible = false;
-      document.querySelectorAll("[data-mode]").forEach((button) => {
-        button.classList.toggle("is-active", button.dataset.mode === "flashcards");
-      });
-      render();
-    });
+    item.addEventListener("click", () => openCard(item.dataset.cardId));
   });
 }
 
 function render() {
+  ensureModuleIsVisible();
   const filtered = getFilteredQuestions();
   ensureCurrentCardIsVisible();
   renderStats(filtered);
-  renderTopicFilters(filtered);
+  renderTopicFilters();
+  renderModuleFilters();
+  renderCourseBrief();
+  renderCourseOutline();
   renderRecommendations(filtered);
   renderQuestionList(filtered);
 
@@ -605,4 +995,5 @@ function render() {
   }
 }
 
+updateModeButtons();
 render();
