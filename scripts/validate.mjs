@@ -1,8 +1,24 @@
 import { access } from "node:fs/promises";
 import { constants } from "node:fs";
 import { courseCatalog, moduleIndex, questionBank, totalModules } from "../src/questions.js";
+import {
+  koreaUniversityQuickFacts,
+  koreaUniversitySources,
+  koreaUniversityStudyPlan,
+  koreaUniversitySubjects,
+} from "../src/korea-year1-data.js";
 
-const requiredFiles = ["index.html", "styles.css", "server.js", "src/app.js", "src/questions.js"];
+const requiredFiles = [
+  "index.html",
+  "study.html",
+  "home.css",
+  "styles.css",
+  "server.js",
+  "src/app.js",
+  "src/questions.js",
+  "src/korea-year1-data.js",
+  "src/korea-year1.js",
+];
 
 for (const file of requiredFiles) {
   await access(new URL(`../${file}`, import.meta.url), constants.R_OK);
@@ -77,6 +93,38 @@ for (const card of questionBank) {
   }
 }
 
+if (koreaUniversitySubjects.length < 10) {
+  throw new Error("Expected at least 10 Korea University first-year subjects.");
+}
+
+if (koreaUniversitySources.length < 5) {
+  throw new Error("Expected at least 5 Korea University official sources.");
+}
+
+if (koreaUniversityStudyPlan.length < 4) {
+  throw new Error("Expected at least 4 Korea University study-plan steps.");
+}
+
+if (koreaUniversityQuickFacts.length < 4) {
+  throw new Error("Expected at least 4 Korea University quick facts.");
+}
+
+for (const subject of koreaUniversitySubjects) {
+  for (const key of ["id", "code", "title", "titleKo", "category", "credits", "timing", "summary"]) {
+    if (!subject[key] || typeof subject[key] !== "string") {
+      throw new Error(`Invalid or missing "${key}" on Korea University subject ${subject.id ?? "<unknown>"}.`);
+    }
+  }
+
+  if (!Array.isArray(subject.qa) || subject.qa.length < 3) {
+    throw new Error(`Korea University subject ${subject.id} should include at least 3 Q&A items.`);
+  }
+
+  if (!Array.isArray(subject.checklist) || subject.checklist.length < 3) {
+    throw new Error(`Korea University subject ${subject.id} should include at least 3 checklist items.`);
+  }
+}
+
 console.log(
-  `Validated ${courseCatalog.length} courses, ${totalModules} modules, ${questionBank.length} study cards, and required project files.`
+  `Validated ${courseCatalog.length} courses, ${totalModules} modules, ${questionBank.length} study cards, ${koreaUniversitySubjects.length} Korea University subjects, and required project files.`
 );

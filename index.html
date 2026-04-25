@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CS Study Sprint</title>
+    <title>Studying in Korea University Computer Science</title>
     <meta
       name="description"
-      content="A lightweight computer science study app with flashcards, quiz mode, and progress tracking."
+      content="A first-year Korea University Computer Science study hub with official subject mapping, study planning, and starter Q&A for each subject."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,89 +14,161 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="home.css" />
   </head>
   <body>
-    <div class="page-shell">
-      <header class="hero">
-        <div class="hero-copy">
-          <p class="eyebrow">Computer Science Study App</p>
-          <h1>CS Study Sprint</h1>
-          <p class="hero-text">
-            Train core computer science concepts with topic filters, quick-answer flashcards,
-            and a quiz mode that remembers what still needs review.
-          </p>
+    <div class="home-shell">
+      <header class="home-hero">
+        <div class="hero-topline">Korea University · Computer Science · Year 1 Study Guide</div>
+        <h1>Studying in Korea University Computer Science Department</h1>
+        <p class="hero-lead">
+          This homepage is tailored for a first-year student in Korea University Computer Science.
+          It gathers the official 2025+ subject structure, turns it into a clear study plan, and
+          adds starter Q&amp;A sets for each year-one subject so your daughter has a calmer place to
+          begin.
+        </p>
+        <div class="hero-actions">
+          <a class="button-link button-link--primary" href="#subjects">Browse first-year subjects</a>
+          <a class="button-link button-link--secondary" href="study.html">Open the current CS Study Sprint</a>
         </div>
-        <div class="hero-panel">
-          <div class="hero-panel__label">Today’s focus</div>
-          <p id="focus-summary" class="hero-panel__summary"></p>
-          <div class="hero-panel__meta">
-            <span id="focus-topic"></span>
-            <span id="focus-module"></span>
-            <span id="focus-difficulty"></span>
-          </div>
-        </div>
+        <div class="hero-stats" id="hero-stats"></div>
       </header>
 
-      <main class="layout">
-        <section class="primary-column">
-          <div class="stats-grid" id="stats-grid"></div>
-
-          <section class="toolbar card-surface">
-            <div class="toolbar__row">
-              <div class="mode-switch" role="tablist" aria-label="Study mode">
-                <button class="mode-switch__button is-active" data-mode="flashcards">Flashcards</button>
-                <button class="mode-switch__button" data-mode="quiz">Quiz mode</button>
+      <main class="main-grid">
+        <section class="column">
+          <section class="panel">
+            <div class="section-header">
+              <div>
+                <h2>What is on this page</h2>
+                <p>
+                  This page focuses on the official first-year subject map for Korea University
+                  Computer Science students entering under the 2025+ curriculum.
+                </p>
               </div>
-
-              <label class="search">
-                <span class="search__label">Search questions</span>
-                <input
-                  id="search-input"
-                  type="search"
-                  placeholder="Try binary search, ACID, TCP..."
-                  autocomplete="off"
-                />
-              </label>
             </div>
-
-            <div class="topics" id="topic-filters"></div>
-            <div class="modules" id="module-filters"></div>
+            <div class="fact-grid">
+              <article class="fact-card">
+                <strong>Official subject map</strong>
+                <span>
+                  The subject list is grounded in the Korea University Computer Science curriculum
+                  table and the university course-code guide.
+                </span>
+              </article>
+              <article class="fact-card">
+                <strong>Parent-friendly structure</strong>
+                <span>
+                  University-wide requirements and Computer Science foundations are separated so the
+                  study load is easier to understand.
+                </span>
+              </article>
+              <article class="fact-card">
+                <strong>Starter Q&amp;A only</strong>
+                <span>
+                  The Q&amp;A sets below are study aids generated from official course names and
+                  descriptions, not official syllabi or exam banks.
+                </span>
+              </article>
+            </div>
           </section>
 
-          <section class="course-brief card-surface" id="course-brief"></section>
+          <section class="panel">
+            <div class="section-header">
+              <div>
+                <h2>Study-building plan</h2>
+                <p>
+                  This is the concrete plan I used for the Korea University version of the site, and
+                  it is also the right path for keeping it up to date each semester.
+                </p>
+              </div>
+            </div>
+            <div class="plan-list" id="plan-list"></div>
+          </section>
 
-          <section class="study-stage card-surface" id="study-stage"></section>
+          <section class="subject-browser" id="subjects">
+            <aside class="subject-sidebar">
+              <div class="section-header">
+                <div>
+                  <h2>First-year subjects</h2>
+                  <p>Select any subject to open its summary, study checklist, and starter Q&amp;A.</p>
+                </div>
+              </div>
+              <div id="subject-groups"></div>
+            </aside>
+
+            <article class="subject-detail" id="subject-detail"></article>
+          </section>
         </section>
 
-        <aside class="secondary-column">
-          <section class="card-surface side-panel">
-            <div class="side-panel__header">
-              <h2>Course tree</h2>
-              <p>Browse the source-backed structure of the active course.</p>
+        <aside class="column">
+          <section class="panel">
+            <div class="section-header">
+              <div>
+                <h2>Official sources</h2>
+                <p>
+                  These are the main Korea University pages used to map the current first-year
+                  structure.
+                </p>
+              </div>
             </div>
-            <div id="course-outline" class="course-outline"></div>
+            <div class="source-list" id="source-list"></div>
           </section>
 
-          <section class="card-surface side-panel">
-            <div class="side-panel__header">
-              <h2>Recommended next steps</h2>
-              <p>Use your recent quiz activity to decide what to revisit.</p>
+          <section class="panel">
+            <div class="section-header">
+              <div>
+                <h2>Practical notes for your daughter</h2>
+                <p>
+                  These are the highest-signal habits for surviving the first year without getting
+                  surprised by avoidable issues.
+                </p>
+              </div>
             </div>
-            <div id="recommendations" class="recommendations"></div>
+            <div class="tip-stack">
+              <article class="tip-card">
+                <strong>Watch notices early</strong>
+                <p>
+                  Korea University course registration details and seminar instructions change by
+                  semester, so department notices matter almost as much as the curriculum table.
+                </p>
+              </article>
+              <article class="tip-card">
+                <strong>Protect semester 1 foundations</strong>
+                <p>
+                  If Computer Programming I or Mathematics for Computer Science I becomes shaky, fix
+                  that quickly because later core CS courses stack on top of them.
+                </p>
+              </article>
+              <article class="tip-card">
+                <strong>Treat low-credit required courses seriously</strong>
+                <p>
+                  Seminar courses and online tasks are easy to underestimate, but they still affect
+                  required progress and can create needless stress if ignored.
+                </p>
+              </article>
+            </div>
           </section>
 
-          <section class="card-surface side-panel">
-            <div class="side-panel__header">
-              <h2>Q&amp;A browser</h2>
-              <p>Jump into a researched course, module, or exact study card.</p>
+          <section class="panel">
+            <div class="section-header">
+              <div>
+                <h2>Main page links</h2>
+                <p>
+                  The broader computer science study app is still here. It now lives as a linked
+                  page instead of the default homepage.
+                </p>
+              </div>
             </div>
-            <div id="question-list" class="question-list"></div>
+            <div class="path-links">
+              <a class="path-link" href="study.html">Open the current CS Study Sprint</a>
+              <a class="path-link" href="https://github.com/buicongnguyen/study_computer_science/blob/main/CURRICULUM_PLAN.md" target="_blank" rel="noreferrer">
+                Open the broader curriculum notes in the repository
+              </a>
+            </div>
           </section>
         </aside>
       </main>
-    </div>
 
-    <script type="module" src="src/app.js"></script>
+      <script type="module" src="src/korea-year1.js"></script>
+    </div>
   </body>
 </html>

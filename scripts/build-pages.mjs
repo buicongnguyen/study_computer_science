@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 const rootDir = process.cwd();
 const distDir = join(rootDir, "dist");
-const publicEntries = ["index.html", "styles.css", "src"];
+const publicEntries = ["index.html", "study.html", "home.css", "styles.css", "src"];
 
 await rm(distDir, { recursive: true, force: true });
 await mkdir(distDir, { recursive: true });
