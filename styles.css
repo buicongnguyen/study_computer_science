@@ -30,6 +30,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   font-family: "IBM Plex Sans", "Segoe UI Variable", "Trebuchet MS", sans-serif;
   color: var(--text);
   background:
@@ -53,6 +54,15 @@ body::before {
 button,
 input {
   font: inherit;
+}
+
+button,
+.topic-pill,
+.action-button,
+.ghost-button,
+.quiz-option,
+.path-step {
+  touch-action: manipulation;
 }
 
 .page-shell {
@@ -262,6 +272,7 @@ input {
 .mode-switch__button {
   border-radius: 999px;
   padding: 12px 18px;
+  min-height: 48px;
   color: var(--text-muted);
   background: transparent;
   cursor: pointer;
@@ -314,10 +325,12 @@ input {
 
 .topic-pill {
   padding: 10px 14px;
+  min-height: 44px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-muted);
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .topic-pill.is-active {
@@ -460,6 +473,7 @@ input {
   gap: 8px;
   text-align: left;
   padding: 16px;
+  min-height: 120px;
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
@@ -681,7 +695,11 @@ input {
 
 .action-button,
 .ghost-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 13px 16px;
+  min-height: 48px;
   border-radius: 14px;
   cursor: pointer;
 }
@@ -908,5 +926,65 @@ input {
 
   .course-brief__summary-card {
     min-width: 100%;
+  }
+
+  .mode-switch {
+    width: 100%;
+    flex-wrap: wrap;
+    border-radius: 22px;
+  }
+
+  .mode-switch__button {
+    flex: 1 1 160px;
+  }
+
+  .hero-panel__summary {
+    font-size: 1.2rem;
+  }
+
+  .hero-panel__meta,
+  .stage-badges,
+  .course-selector-card__meta,
+  .course-selector-card__actions,
+  .question-list__meta {
+    gap: 8px;
+  }
+
+  .topics,
+  .modules {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin-inline: -2px;
+    scrollbar-width: thin;
+  }
+
+  .topics > *,
+  .modules > * {
+    flex: 0 0 auto;
+  }
+
+  .action-row {
+    flex-direction: column;
+  }
+
+  .action-row > button,
+  .action-row > a {
+    width: 100%;
+  }
+
+  .prompt-card,
+  .recommendation-card,
+  .question-list__item,
+  .module-card,
+  .course-selector-card,
+  .outline-course-card,
+  .info-block,
+  .module-focus {
+    padding: 16px;
+  }
+
+  .prompt-card__question {
+    font-size: clamp(1.25rem, 6vw, 1.65rem);
   }
 }

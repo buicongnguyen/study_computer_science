@@ -28,6 +28,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   color: var(--text);
   font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
   background:
@@ -51,6 +52,13 @@ body::before {
 a,
 button {
   font: inherit;
+}
+
+button,
+.button-link,
+.path-link,
+.subject-button {
+  touch-action: manipulation;
 }
 
 .home-shell {
@@ -136,6 +144,7 @@ button {
   border: 1px solid transparent;
   border-radius: 999px;
   padding: 13px 18px;
+  min-height: 48px;
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -399,6 +408,11 @@ button {
   text-align: left;
 }
 
+.subject-button__name,
+.subject-button__meta {
+  line-height: 1.4;
+}
+
 .subject-button.is-active {
   background: rgba(122, 0, 25, 0.1);
   border-color: rgba(122, 0, 25, 0.26);
@@ -472,6 +486,7 @@ button {
   cursor: pointer;
   font-weight: 700;
   list-style: none;
+  line-height: 1.5;
 }
 
 .qa-card summary::-webkit-details-marker {
@@ -540,5 +555,31 @@ button {
 
   .hero-actions {
     flex-direction: column;
+  }
+
+  .hero-actions .button-link,
+  .path-link {
+    width: 100%;
+  }
+
+  .hero-stat strong {
+    font-size: 1.5rem;
+  }
+
+  .fact-card strong {
+    font-size: 1.15rem;
+  }
+
+  .subject-meta {
+    gap: 8px;
+  }
+
+  .subject-meta span {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .qa-card {
+    padding: 16px;
   }
 }
