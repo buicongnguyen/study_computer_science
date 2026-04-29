@@ -109,6 +109,8 @@ if (koreaUniversityQuickFacts.length < 4) {
   throw new Error("Expected at least 4 Korea University quick facts.");
 }
 
+const totalKoreaQuestions = koreaUniversitySubjects.reduce((sum, subject) => sum + subject.qa.length, 0);
+
 for (const subject of koreaUniversitySubjects) {
   for (const key of ["id", "code", "title", "titleKo", "category", "credits", "timing", "summary"]) {
     if (!subject[key] || typeof subject[key] !== "string") {
@@ -116,8 +118,8 @@ for (const subject of koreaUniversitySubjects) {
     }
   }
 
-  if (!Array.isArray(subject.qa) || subject.qa.length < 3) {
-    throw new Error(`Korea University subject ${subject.id} should include at least 3 Q&A items.`);
+  if (!Array.isArray(subject.qa) || subject.qa.length < 8) {
+    throw new Error(`Korea University subject ${subject.id} should include at least 8 Q&A items.`);
   }
 
   if (!Array.isArray(subject.checklist) || subject.checklist.length < 3) {
@@ -125,6 +127,10 @@ for (const subject of koreaUniversitySubjects) {
   }
 }
 
+if (totalKoreaQuestions < 80) {
+  throw new Error("Expected at least 80 Korea University Q&A items after the study-guide expansion.");
+}
+
 console.log(
-  `Validated ${courseCatalog.length} courses, ${totalModules} modules, ${questionBank.length} study cards, ${koreaUniversitySubjects.length} Korea University subjects, and required project files.`
+  `Validated ${courseCatalog.length} courses, ${totalModules} modules, ${questionBank.length} study cards, ${koreaUniversitySubjects.length} Korea University subjects, ${totalKoreaQuestions} Korea University Q&A items, and required project files.`
 );

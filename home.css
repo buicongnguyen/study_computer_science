@@ -162,7 +162,7 @@ button {
 
 .hero-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 16px;
   margin-top: 28px;
 }
@@ -288,7 +288,6 @@ button {
 }
 
 .plan-step strong,
-.qa-card strong,
 .source-card strong,
 .fact-card strong,
 .subject-group strong,
@@ -297,7 +296,6 @@ button {
 }
 
 .plan-step strong,
-.qa-card strong,
 .source-card strong,
 .subject-group strong,
 .subject-detail h3 {
@@ -468,6 +466,31 @@ button {
 
 .qa-card {
   padding: 18px;
+}
+
+.qa-card summary {
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+}
+
+.qa-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.qa-card summary::after {
+  content: "+";
+  float: right;
+  color: var(--accent);
+  font-family: "Sora", "Aptos", sans-serif;
+}
+
+.qa-card[open] summary::after {
+  content: "-";
+}
+
+.qa-library-note {
+  margin-bottom: 12px;
 }
 
 .qa-card__answer {

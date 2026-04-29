@@ -173,6 +173,31 @@ export const koreaUniversitySubjects = [
         answer:
           "A strong response states a claim, supports it with evidence from the text, and explains why that evidence matters.",
       },
+      {
+        question: "Why does the official emphasis on question-based learning matter?",
+        answer:
+          "It means the class is not only asking for correct answers. It expects students to generate useful questions that open discussion and deeper analysis.",
+      },
+      {
+        question: "What makes an interdisciplinary question useful in this course?",
+        answer:
+          "A useful question connects a problem to more than one lens, such as ethics, society, science, or history, instead of treating it as one-dimensional.",
+      },
+      {
+        question: "How can she turn a reading into better discussion notes?",
+        answer:
+          "She can write one key claim from the text, one supporting example, one possible objection, and one question she wants the class to explore.",
+      },
+      {
+        question: "What is the difference between an opinion and an argument in this subject?",
+        answer:
+          "An opinion is only a position. An argument explains the position with reasons, evidence, and a clear chain of logic.",
+      },
+      {
+        question: "Why does collaboration matter in a course about thinking?",
+        answer:
+          "Discussion with others exposes blind spots, tests whether an idea is actually persuasive, and helps refine rough thinking into a stronger position.",
+      },
     ],
   },
   {
@@ -209,6 +234,31 @@ export const koreaUniversitySubjects = [
         question: "What is a common mistake in first-year essays?",
         answer:
           "Many essays summarize sources without explaining the writer's own argument or why the evidence proves it.",
+      },
+      {
+        question: "What usually makes a paragraph feel coherent?",
+        answer:
+          "A clear topic sentence, relevant evidence, and a final sentence that explains how the evidence supports the paragraph's point.",
+      },
+      {
+        question: "How should she use sources without sounding like she is copying them?",
+        answer:
+          "She should first understand the source, then restate its meaning in her own words and explain why it matters for her argument.",
+      },
+      {
+        question: "Why does outlining help before drafting?",
+        answer:
+          "An outline reveals whether the paper actually has a logical order before she spends time polishing sentences.",
+      },
+      {
+        question: "What should she do when feedback says her writing is vague?",
+        answer:
+          "She should replace broad claims with specific examples, define unclear terms, and explain exactly how each example supports her point.",
+      },
+      {
+        question: "Why does a Computer Science student still need strong writing?",
+        answer:
+          "Because reports, technical explanations, project documentation, research summaries, and internship materials all depend on clear written thinking.",
       },
     ],
   },
@@ -247,6 +297,31 @@ export const koreaUniversitySubjects = [
         answer:
           "Listening and speaking improve noticeably when students repeatedly work with one topic area instead of only memorizing word lists.",
       },
+      {
+        question: "How should she approach an academic article when the vocabulary feels heavy?",
+        answer:
+          "Read the title, headings, introduction, and topic sentences first so she understands the structure before getting stuck on individual words.",
+      },
+      {
+        question: "What should she do with unfamiliar words that keep appearing?",
+        answer:
+          "Record the word, its likely meaning from context, and one example sentence so the vocabulary stays connected to actual use.",
+      },
+      {
+        question: "Does she need to understand every word to understand the reading?",
+        answer:
+          "No. She usually needs the main argument, structure, and key supporting points more than perfect word-by-word translation.",
+      },
+      {
+        question: "What is a practical way to improve speaking for this course?",
+        answer:
+          "After reading or watching material, she can explain the main idea aloud in English for one minute and add one follow-up question.",
+      },
+      {
+        question: "Why does repeated exposure to one topic help language growth?",
+        answer:
+          "Because recurring themes build vocabulary, confidence, and faster comprehension within a familiar domain.",
+      },
     ],
   },
   {
@@ -283,6 +358,31 @@ export const koreaUniversitySubjects = [
         question: "What is a smart outcome to aim for by the end of Seminar I?",
         answer:
           "She should know where to find notices, how registration works, and who to ask when something academic goes wrong.",
+      },
+      {
+        question: "What are the three main pieces of the seminar according to the official page?",
+        answer:
+          "The seminar combines adviser-led sections, online joint lectures, and department-specific programming.",
+      },
+      {
+        question: "Why is it useful to save adviser and office contact details early?",
+        answer:
+          "When registration, attendance, or paperwork issues appear, quick access to the right person reduces panic and delay.",
+      },
+      {
+        question: "What weekly routine keeps this course from becoming an avoidable problem?",
+        answer:
+          "Check the LMS, scan department notices, confirm deadlines, and finish small completion tasks before the last day.",
+      },
+      {
+        question: "What should she do if an online seminar task looks trivial?",
+        answer:
+          "Do it early anyway, because low-effort tasks are often the ones students forget and then regret.",
+      },
+      {
+        question: "Why does semester-one administrative knowledge matter so much?",
+        answer:
+          "Because first-year stress often comes less from hard content than from missing procedures, deadlines, or official instructions.",
       },
     ],
   },
@@ -321,6 +421,31 @@ export const koreaUniversitySubjects = [
         answer:
           "Because early corrections in routine, attendance, and planning are much cheaper than fixing accumulated problems later.",
       },
+      {
+        question: "What records are worth reviewing before Seminar II discussions?",
+        answer:
+          "Grades, missed deadlines, attendance patterns, weekly schedules, and notes on which study habits actually worked.",
+      },
+      {
+        question: "How can she use adviser time well in this seminar?",
+        answer:
+          "Bring concrete questions such as course-load options, time conflicts, or whether a planned habit change is realistic.",
+      },
+      {
+        question: "What planning job should happen before second-semester registration?",
+        answer:
+          "She should map required courses, estimate workload honestly, and leave enough time for programming and math practice outside class hours.",
+      },
+      {
+        question: "Why does career exploration belong in a first-year seminar?",
+        answer:
+          "Because early exposure helps students connect current courses with future paths such as software, AI, research, or interdisciplinary work.",
+      },
+      {
+        question: "What is a healthy improvement target for the second semester?",
+        answer:
+          "Pick one or two habits to fix deeply, such as attendance or daily review, instead of trying to overhaul everything at once.",
+      },
     ],
   },
   {
@@ -357,6 +482,31 @@ export const koreaUniversitySubjects = [
         question: "What is the difference between an algorithm and a program?",
         answer:
           "An algorithm is the problem-solving method, while a program is one concrete implementation of that method in a language.",
+      },
+      {
+        question: "What does a variable really represent in an early Python course?",
+        answer:
+          "A variable is a named place to store a value so the program can reuse, update, or compare it while solving a problem.",
+      },
+      {
+        question: "Why is line-by-line tracing so effective for beginners?",
+        answer:
+          "It forces the student to see exactly how values change, which often reveals logic mistakes faster than guessing.",
+      },
+      {
+        question: "How are conditionals and loops different?",
+        answer:
+          "Conditionals choose between paths, while loops repeat a set of steps until a stopping condition is reached.",
+      },
+      {
+        question: "What makes debugging more effective than random trial and error?",
+        answer:
+          "Good debugging means reproducing the problem, isolating where the logic fails, and testing one explanation at a time.",
+      },
+      {
+        question: "Why is Python a friendly first language for this course?",
+        answer:
+          "Its simpler syntax lets students focus more on problem structure and less on heavy language ceremony.",
       },
     ],
   },
@@ -395,6 +545,31 @@ export const koreaUniversitySubjects = [
         answer:
           "Because even a sophisticated model gives weak results if the underlying data is messy, biased, or mislabeled.",
       },
+      {
+        question: "What makes a data visualization genuinely useful?",
+        answer:
+          "A useful visualization makes a pattern, comparison, or anomaly clearer than raw tables alone and matches the question being asked.",
+      },
+      {
+        question: "Why is correlation not the same as causation?",
+        answer:
+          "Two variables can move together without one actually causing the other, so interpretation needs caution and context.",
+      },
+      {
+        question: "What is overfitting in simple terms?",
+        answer:
+          "Overfitting happens when a model memorizes training patterns too specifically and then performs poorly on new data.",
+      },
+      {
+        question: "Why does domain context matter in data work?",
+        answer:
+          "Because the same numbers can mean different things depending on how the data was collected, labeled, and intended to be used.",
+      },
+      {
+        question: "What should a first-year student ask before trusting an AI output?",
+        answer:
+          "She should ask what data it relied on, how success was measured, and whether the result makes sense in the real context.",
+      },
     ],
   },
   {
@@ -431,6 +606,31 @@ export const koreaUniversitySubjects = [
         question: "What often makes biology feel hard at first?",
         answer:
           "Many students try to memorize terms without first understanding the process or relationship those terms describe.",
+      },
+      {
+        question: "Why is understanding a process more valuable than memorizing isolated vocabulary?",
+        answer:
+          "Once she understands how a system works, the terminology becomes easier to place and recall meaningfully.",
+      },
+      {
+        question: "Why does the course connect life, disease, and treatment technology?",
+        answer:
+          "Because the subject is designed to show how biological knowledge links to real human problems and modern technological responses.",
+      },
+      {
+        question: "What does a systems view mean in biology?",
+        answer:
+          "It means seeing parts of life as connected processes rather than unrelated facts, such as how a change in one system affects others.",
+      },
+      {
+        question: "Why should she attach each new concept to one concrete example?",
+        answer:
+          "Examples make abstract biological ideas easier to remember and easier to explain back in her own words.",
+      },
+      {
+        question: "How does this course support interdisciplinary thinking?",
+        answer:
+          "It asks students to understand scientific ideas and also notice how they connect to technology, society, and future applications.",
       },
     ],
   },
@@ -469,6 +669,31 @@ export const koreaUniversitySubjects = [
         answer:
           "Write and test small programs almost every day, because debugging skill grows from repetition, not from reading alone.",
       },
+      {
+        question: "What is the difference between compiling and running a C program?",
+        answer:
+          "Compiling translates source code into an executable form, while running executes that compiled program with actual input and state changes.",
+      },
+      {
+        question: "Why should she break code into functions early?",
+        answer:
+          "Functions make programs easier to test, reuse, and understand because each piece can focus on one job.",
+      },
+      {
+        question: "What makes arrays an important early concept?",
+        answer:
+          "Arrays teach how programs store and process many related values under one indexed structure.",
+      },
+      {
+        question: "What bug pattern hurts many beginners in C?",
+        answer:
+          "Off-by-one loops, uninitialized variables, and incorrect assumptions about memory often cause wrong output or crashes.",
+      },
+      {
+        question: "Why is step-by-step tracing still valuable even when tools exist?",
+        answer:
+          "Tracing builds the mental model of how the program changes state, which is the foundation for using debuggers effectively later.",
+      },
     ],
   },
   {
@@ -506,6 +731,31 @@ export const koreaUniversitySubjects = [
         answer:
           "Students often memorize procedures such as row reduction without understanding what the operations are doing or what the final form means.",
       },
+      {
+        question: "What can a vector represent beyond a list of numbers?",
+        answer:
+          "A vector can also represent direction, magnitude, a point in space, or a bundle of features depending on the problem.",
+      },
+      {
+        question: "What does matrix multiplication often represent conceptually?",
+        answer:
+          "It often represents combining transformations or applying a structured rule to many values at once.",
+      },
+      {
+        question: "Why does linear independence matter?",
+        answer:
+          "It tells us whether vectors contribute genuinely new information instead of being built from one another.",
+      },
+      {
+        question: "Why do row operations preserve the solution set of a linear system?",
+        answer:
+          "Because they transform the equations into equivalent forms without changing which variable values satisfy all of them.",
+      },
+      {
+        question: "What is a basis in simple language?",
+        answer:
+          "A basis is a minimal set of independent vectors that can build every vector in the space being studied.",
+      },
     ],
   },
   {
@@ -542,6 +792,31 @@ export const koreaUniversitySubjects = [
         question: "Why does probability matter for Computer Science beyond math class?",
         answer:
           "Because real systems involve uncertainty, noisy data, randomized algorithms, and performance that must be measured rather than assumed.",
+      },
+      {
+        question: "What is conditional probability trying to measure?",
+        answer:
+          "It measures how likely an event is once we already know that another event has happened.",
+      },
+      {
+        question: "How are independence and mutual exclusivity different?",
+        answer:
+          "Independent events do not affect each other's probabilities, while mutually exclusive events cannot happen at the same time.",
+      },
+      {
+        question: "Why should she care about sampling bias in an intro statistics course?",
+        answer:
+          "Because conclusions drawn from unrepresentative data can look mathematically clean while still being misleading.",
+      },
+      {
+        question: "What does the law of large numbers suggest informally?",
+        answer:
+          "As the number of observations grows, measured averages tend to stabilize closer to the underlying expected value.",
+      },
+      {
+        question: "Why is it helpful to visualize a distribution instead of only quoting one number?",
+        answer:
+          "A picture of the spread, shape, and outliers often reveals patterns that a single average would hide.",
       },
     ],
   },

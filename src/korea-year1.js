@@ -10,6 +10,14 @@ import {
 const subjectMap = Object.fromEntries(
   koreaUniversitySubjects.map((subject) => [subject.id, subject])
 );
+const totalKoreaQuestions = koreaUniversitySubjects.reduce((sum, subject) => sum + subject.qa.length, 0);
+const heroFacts = [
+  {
+    value: String(totalKoreaQuestions),
+    label: "guided Q&A prompts",
+  },
+  ...koreaUniversityQuickFacts,
+];
 
 const state = {
   activeSubjectId: koreaUniversityDefaultSubjectId,
@@ -36,7 +44,7 @@ function escapeHtml(value) {
 }
 
 function renderStats() {
-  statsRoot.innerHTML = koreaUniversityQuickFacts
+  statsRoot.innerHTML = heroFacts
     .map(
       (fact) => `
         <article class="hero-stat">
@@ -153,15 +161,16 @@ function renderSubjectDetail() {
     </div>
 
     <div class="panel-inline">
-      <h3>Starter Q&amp;A for this subject</h3>
+      <h3>Study Q&amp;A library</h3>
+      <p class="qa-library-note">${subject.qa.length} guided questions for quick review and discussion practice.</p>
       <div class="qa-list">
         ${subject.qa
           .map(
             (item) => `
-              <article class="qa-card">
-                <strong>${escapeHtml(item.question)}</strong>
+              <details class="qa-card">
+                <summary>${escapeHtml(item.question)}</summary>
                 <p class="qa-card__answer">${escapeHtml(item.answer)}</p>
-              </article>
+              </details>
             `
           )
           .join("")}

@@ -11,7 +11,7 @@ The site includes researched course maps adapted from official university course
 
 - A Korea University Computer Science year-one homepage with official subject mapping
 - A study plan for building subject-by-subject Korea University Q&A content
-- Starter Q&A sets for first-year Korea University subjects
+- Expanded guided Q&A libraries for first-year Korea University subjects
 - Flashcards with reveal-answer flow
 - Quiz mode with multiple-choice practice
 - Topic and module filters
